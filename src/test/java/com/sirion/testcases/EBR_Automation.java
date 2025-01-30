@@ -83,7 +83,7 @@ public class EBR_Automation {
 	}
 
 	public static Response deleteEBRID(String refId) {
-		String endpoint = showEventsEndpointValue + refId;
+		String endpoint = deleteEventEndpoint + refId;
 		return given().contentType("application/json").header("Cookie", "Authorization=" + Token + "").when()
 				.get(endpoint).then().assertThat().statusCode(200).extract().response();
 	}
@@ -153,10 +153,6 @@ public class EBR_Automation {
 		TestUtil.addStatusColumn("Status", OUTPUT_FILE_PATH, 1);
 		List<String> givenEBRIds = TestUtil.getFieldValues(INPUT_FILE_PATH);
 		TestUtil.cloneExcelFile(INPUT_FILE_PATH, OUTPUT_FILE_PATH);
-		WebDriver driver = TestUtil.initializeWebDriver();
-		TestUtil.getLogin(driver, properties);
-		Thread.sleep(2000);
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		for (int givenEBRIdIndex = 0; givenEBRIdIndex < givenEBRIds.size(); givenEBRIdIndex++) {
 			String givenEBRId = givenEBRIds.get(givenEBRIdIndex);
 			Boolean ebrFound = false;
@@ -170,19 +166,17 @@ public class EBR_Automation {
 				}
 			}
 			if (ebrFound) {
-				Thread.sleep(3000);
-				System.out.println("EBR ID found " + ebrFound);
+				System.out.println("EBR ID " + givenEBRId + " found");
 				String refId = refIDs.get(index);
-				driver.get(url + path + refId);
-				Thread.sleep(3000);
-				String deleteXpath = "//button[@title=\"Delete\"]";
-				By deleteButton = By.xpath(deleteXpath);
-//				wait.until(ExpectedConditions.visibilityOfElementLocated(deleteButton));
-				driver.findElement(deleteButton).click();
-				driver.findElement(By.xpath("//button[@type=\"button\" and normalize-space()=\"Yes\"]")).click();
-				String status = "Deleted";
-				TestUtil.saveStatusInExcel(status, rowIndexForRule, OUTPUT_FILE_PATH, 1);
-				// Response showEventResponse = deleteEBR(refId);
+				Response deleteResponse = deleteEBRID(refId);
+				boolean success = deleteResponse.jsonPath().getBoolean("success");
+				if (success) {
+					String status = "Deleted";
+					TestUtil.saveStatusInExcel(status, rowIndexForRule, OUTPUT_FILE_PATH, 1);
+				} else {
+					String status = "Unable to delete";
+					TestUtil.saveStatusInExcel(status, rowIndexForRule, OUTPUT_FILE_PATH, 1);
+				}
 			} else {
 				String status = "not found";
 				TestUtil.saveStatusInExcel(status, rowIndexForRule, OUTPUT_FILE_PATH, 1);
@@ -203,7 +197,6 @@ public class EBR_Automation {
 		Thread.sleep(2000);
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		JavascriptExecutor executor = (JavascriptExecutor) driver;
-
 		for (int givenEBRIdIndex = 0; givenEBRIdIndex < givenEBRIds.size(); givenEBRIdIndex++) {
 			String givenEBRId = givenEBRIds.get(givenEBRIdIndex);
 			Boolean ebrFound = false;
