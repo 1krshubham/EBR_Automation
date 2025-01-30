@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.sirion.util.TestUtil;
@@ -22,9 +20,7 @@ import io.restassured.response.Response;
 
 public class EBR_Automation {
 
-	static final String Proerties_File_Path = "./src/main/java/com/sirion/config/config.properties";
-	static Properties property = new Properties();
-	static Properties properties = TestUtil.ReadPropertiesFile(property, Proerties_File_Path);
+	static final Properties properties = TestUtil.ReadPropertiesFile();
 	static final String payload = "{\r\n" + "    \"filterMap\": {}\r\n" + "}";
 	static final String Token = TestUtil.getToken(properties);
 	static final String INPUT_FILE_PATH = TestUtil.getInfo(properties, "InputFilePath");

@@ -50,10 +50,13 @@ public class TestUtil {
 
 		return DigestUtils.md5Hex(password).toLowerCase();
 	}
+	
+	public static Properties ReadPropertiesFile() {
 
-	public static Properties ReadPropertiesFile(Properties properties, String proerties_File_Path) {
+		final Properties properties = new Properties();
+		final String propertyPath = "./src/main/java/com/sirion/config/config.properties";
 		try {
-			FileInputStream fileInputStream = new FileInputStream(proerties_File_Path);
+			FileInputStream fileInputStream = new FileInputStream(propertyPath);
 			properties.load(fileInputStream);
 			fileInputStream.close();
 		} catch (IOException e) {
